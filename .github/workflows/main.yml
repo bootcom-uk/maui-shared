@@ -15,10 +15,12 @@ jobs:
       BUILD_CONFIG: 'Release'
       SOLUTION: 'Shared.sln'
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # Prevent a shallow clone to allow git describe --tags
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.5
@@ -33,6 +35,9 @@ jobs:
          dotnet-version: |
            8.0.x
          include-prerelease: false
+
+     - name: Setup msbuild
+      uses: microsoft/setup-msbuild@v1.1
 
     - name: Build
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
