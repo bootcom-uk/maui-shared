@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interfaces", "Interfaces\Interfaces.csproj", "{352E8873-1990-4557-86E3-1B5E855D84D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{D492260C-759F-4F58-932F-10D85B76C1FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models.Internal", "Models\Models.Internal\Models.Internal.csproj", "{72BDD766-8E71-4CB9-B288-EE309F60986F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +21,17 @@ Global
 		{352E8873-1990-4557-86E3-1B5E855D84D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{352E8873-1990-4557-86E3-1B5E855D84D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{352E8873-1990-4557-86E3-1B5E855D84D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72BDD766-8E71-4CB9-B288-EE309F60986F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72BDD766-8E71-4CB9-B288-EE309F60986F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72BDD766-8E71-4CB9-B288-EE309F60986F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72BDD766-8E71-4CB9-B288-EE309F60986F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{352E8873-1990-4557-86E3-1B5E855D84D6} = {502C9911-4E59-4816-98FB-E5DBA01E0960}
+		{72BDD766-8E71-4CB9-B288-EE309F60986F} = {D492260C-759F-4F58-932F-10D85B76C1FD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8A708D66-DF32-49BE-B90B-D30E5FE0852A}
