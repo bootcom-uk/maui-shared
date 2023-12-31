@@ -9,16 +9,17 @@
     <Authors>Chris Boot</Authors>
     <Product>BootCom-Maui-Shared-Interfaces</Product>
     <Title>BootCom Interfaces For Maui</Title>
-    <Description>A shared collection of interfaces used for the BootCom .net Maui shared libraries</Description>
+    <Description>A shared collection of interfaces used for the BootCom .NET Maui shared libraries</Description>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BootCom-Maui-Shared-Internal-Models" Version="1.0.0" />
     <PackageReference Include="Realm" Version="11.6.1" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Models\Models.Internal\Models.Internal.csproj" />
   </ItemGroup>
 
 </Project>
