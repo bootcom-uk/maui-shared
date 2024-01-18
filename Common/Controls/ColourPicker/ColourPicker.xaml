@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Controls.ColourPicker.ColourPicker"
+             Loaded="ContentView_Loaded">
+    <Grid
+        Margin="10"
+        RowSpacing="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+    Width="60" />
+            <ColumnDefinition
+    Width="*" />
+        </Grid.ColumnDefinitions>
+            
+        <Grid.RowDefinitions>
+            <RowDefinition
+    Height="60" />
+            <RowDefinition
+    Height="auto" />
+            <RowDefinition
+    Height="auto" />
+            <RowDefinition
+Height="auto" />
+            <RowDefinition
+Height="auto" />
+        </Grid.RowDefinitions>
+
+        <BoxView
+            Grid.ColumnSpan="2"
+            Grid.Row="0"
+            VerticalOptions="FillAndExpand"
+            HorizontalOptions="FillAndExpand"
+            x:Name="colorBox" />
+
+        <Label
+            Grid.Column="0"
+            Grid.Row="1"
+            Text="Red" />
+
+        <Slider
+            x:Name="redSlider"
+            Minimum="0"
+            Maximum="1"
+            Grid.Column="1"
+            ValueChanged="redSlider_ValueChanged"
+            Grid.Row="1" />
+
+        <Label
+            Grid.Column="0"
+            Grid.Row="2"
+            Text="Green" />
+
+        <Slider
+            x:Name="greenSlider"
+            Minimum="0"
+            Maximum="1"
+            Grid.Column="1"
+            ValueChanged="greenSlider_ValueChanged"
+            Grid.Row="2" />
+
+        <Label
+            Grid.Column="0"
+            Grid.Row="3"
+            Text="Blue" />
+
+        <Slider            
+            x:Name="blueSlider"
+            Minimum="0"
+            Maximum="1"
+            Grid.Column="1"
+            ValueChanged="blueSlider_ValueChanged"
+            Grid.Row="3" />
+
+        <HorizontalStackLayout
+            Grid.ColumnSpan="2"
+            Grid.Row="4">
+            <Grid
+                ColumnSpacing="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+    Width="auto" />
+                    <ColumnDefinition
+    Width="auto" />
+                </Grid.ColumnDefinitions>
+                <Label
+                VerticalOptions="Center"
+                Grid.Column="0"
+                Text="Hex:" />
+                <Entry
+                VerticalOptions="Center"
+                Grid.Column="1"
+                    MinimumWidthRequest="100"
+                x:Name="txtHexColor"                    
+                    TextChanged="txtHexColor_TextChanged" />
+            </Grid>
+        </HorizontalStackLayout>
+
+    </Grid>
+</ContentView>
