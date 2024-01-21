@@ -6,7 +6,7 @@ namespace Controls.Inputs;
 public partial class Entry : ContentView
 {
 
-    public enum ValidationTypeEnum
+    public enum AvailableValidationTypes
     {
         EMAIL,
         NONE
@@ -16,7 +16,7 @@ public partial class Entry : ContentView
     public static readonly BindableProperty TitleProperty = BindableProperty.Create(nameof(Title), typeof(string), typeof(Entry), string.Empty);
     public static readonly BindableProperty ValidationRequiredProperty = BindableProperty.Create(nameof(ValidationRequired), typeof(bool), typeof(Entry), false);
     public static readonly BindableProperty EntryKeyboardProperty = BindableProperty.Create(nameof(EntryKeyboard), typeof(Keyboard), typeof(Entry), Keyboard.Default);
-    public static readonly BindableProperty ValidationTypeProperty = BindableProperty.Create(nameof(ValidationType), typeof(ValidationTypeEnum), typeof(Entry), ValidationTypeEnum.NONE);
+    public static readonly BindableProperty ValidationTypeProperty = BindableProperty.Create(nameof(ValidationType), typeof(AvailableValidationTypes), typeof(Entry), AvailableValidationTypes.NONE);
     public static readonly BindableProperty ValidationMessageProperty = BindableProperty.Create(nameof(ValidationMessage), typeof(string), typeof(Entry), string.Empty);
 
     public string ValidationMessage
@@ -37,9 +37,9 @@ public partial class Entry : ContentView
         set => SetValue(ValidationRequiredProperty, value);
     }
 
-    public ValidationTypeEnum ValidationType
+    public AvailableValidationTypes ValidationType
     {
-        get => (ValidationTypeEnum)GetValue(ValidationTypeProperty);
+        get => (AvailableValidationTypes)GetValue(ValidationTypeProperty);
         set => SetValue(ValidationTypeProperty, value);
     }
 
@@ -99,7 +99,7 @@ public partial class Entry : ContentView
 
         switch (ValidationType)
         {
-            case ValidationTypeEnum.EMAIL:
+            case AvailableValidationTypes.EMAIL:
 
                 if (string.IsNullOrWhiteSpace(ValidationMessage))
                 {
@@ -111,9 +111,12 @@ public partial class Entry : ContentView
                     return false;
                 }
 
-                return Regex.IsMatch(Text, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$", RegexOptions.IgnoreCase);
+                return MyRegex().IsMatch(Text);
             default:
                 return true;
         }
     }
+
+    [GeneratedRegex(@"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$", RegexOptions.IgnoreCase, "en-GB")]
+    private static partial Regex MyRegex();
 }
