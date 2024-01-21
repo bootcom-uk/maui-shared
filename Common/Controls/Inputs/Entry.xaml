@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:convertors="clr-namespace:Controls.Convertors"
+             x:Name="this"
+             x:Class="Controls.Inputs.Entry">
+
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <convertors:InvertedBoolConverter 
+                x:Key="invertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentView.Resources>
+    
+    <Grid
+    BindingContext="{x:Reference this}">
+        <Grid.RowDefinitions>
+            <RowDefinition
+        Height="auto" />
+            <RowDefinition
+        Height="auto" />
+            <RowDefinition
+        Height="auto" />
+        </Grid.RowDefinitions>
+
+        <Label
+      StyleClass="InputNameLabel"
+      Margin="0, 30, 0, 0"
+      Grid.Row="0"      
+      Text="{Binding Title}" />
+
+        <Entry
+    Grid.Row="1"
+    StyleClass="CustomEntryStyle"
+    Keyboard="{Binding EntryKeyboard}"
+    Text="{Binding Text, Mode=TwoWay}"/>
+
+        <Label
+    StyleClass="InputErrorLabel"
+      Grid.Row="2"
+      IsVisible="{Binding Valid, Converter={StaticResource invertedBoolConverter}}"
+      Text="{Binding ValidationMessage}" />
+
+    </Grid>
+</ContentView>
