@@ -71,7 +71,7 @@ public partial class Entry : ContentView
         this.Loaded += Entry_Loaded;
     }
 
-    private void Entry_Loaded(object sender, EventArgs e)
+    private void Entry_Loaded(object? sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(Text))
         {
@@ -79,7 +79,7 @@ public partial class Entry : ContentView
         }
     }
 
-    private void Entry_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Entry_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
