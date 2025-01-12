@@ -52,7 +52,7 @@ jobs:
         git push --force
 
     - name: Build controls project
-      run: dotnet build Common/Controls.csproj --configuration Release
+      run: dotnet build Common/Controls/Controls.csproj --configuration Release
 
     - name: Pack controls NuGet package
       run: dotnet pack dotnet build Common/Controls/Controls.csproj --configuration Release --output Common /p:PackageVersion=${{ env.NEW_CONTROLS_VERSION }}
