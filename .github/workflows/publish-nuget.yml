@@ -1,0 +1,69 @@
+name: Publish NuGet Package
+
+on:
+  workflow_run:
+    workflows: ["SonarCloud"]
+    types:
+      - completed
+
+permissions:
+  contents: write  # Allow writing to the repository
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Ensure the entire Git history is fetched
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Get Current Controls Version from File
+      id: get-controls-version
+      shell: bash
+      run: |
+        if [ ! -f controls_version.txt ]; then
+        echo "1.0.0" > controls_version.txt
+        fi
+        CURRENT_CONTROLS_VERSION=$(cat controls_version.txt)
+        echo "CURRENT_CONTROLS_VERSION=$CURRENT_CONTROLS_VERSION" >> $GITHUB_ENV
+
+    - name: Increment Sync Version
+      id: increment-sync-version
+      shell: bash
+      run: |
+        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_CONTROLS_VERSION }}"
+        PATCH=$((PATCH + 1))
+        NEW_CONTROLS_VERSION="$MAJOR.$MINOR.$PATCH"
+        echo "$NEW_CONTROLS_VERSION" > ./controls_version.txt  # Specify the file path explicitly
+        echo "NEW_CONTROLS_VERSION=$NEW_CONTROLS_VERSION" >> $GITHUB_ENV
+
+    - name: Commit Updated Version
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add sync_version.txt
+        git commit -m "Increment version to ${{ env.NEW_CONTROLS_VERSION }}"
+        git push --force
+
+    - name: Build controls project
+      run: dotnet build Common/Controls.csproj --configuration Release
+
+    - name: Pack controls NuGet package
+      run: dotnet pack dotnet build Common/Controls/Controls.csproj --configuration Release --output Common /p:PackageVersion=${{ env.NEW_CONTROLS_VERSION }}
+
+    - name: Publish sync to NuGet
+      shell: pwsh
+      run: |
+        $files = Get-ChildItem -Path "Common/Controls/bin/Release" -Filter *.nupkg -Recurse
+        if ($files.Count -eq 0) {
+          throw "No .nupkg files found in Common/Controls/bin/Release"
+        }
+        $packagePath = $files[0].FullName
+        dotnet nuget push "$packagePath" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+
