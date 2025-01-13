@@ -32,6 +32,9 @@
 	  <MauiXaml Update="ColourPicker\ColourPicker.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Inputs\CodeInputView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Inputs\Entry.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
