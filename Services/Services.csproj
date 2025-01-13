@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -14,10 +14,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BootCom-Maui-Shared-Extensions" Version="1.0.0" />
+    <PackageReference Include="BootCom-Maui-Shared-Extensions" Version="1.0.1" />
     <PackageReference Include="BootCom-Maui-Shared-Interfaces" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
+    <PackageReference Include="System.Net.Security" Version="4.3.2" />
   </ItemGroup>
 
 </Project>

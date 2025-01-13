@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -18,8 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="BootCom-Maui-Shared-Internal-Models" Version="1.0.0" />
-    <PackageReference Include="Realm" Version="11.6.1" />
-    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
   </ItemGroup>
 
 </Project>
