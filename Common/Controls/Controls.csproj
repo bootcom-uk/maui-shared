@@ -19,7 +19,6 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageId>BootCom-Maui-Shared-Controls</PackageId>
 		<Title>BootCom Controls For Maui</Title>
-		<Version>1.0.2</Version>
 		<Authors>Chris Boot</Authors>
 		<Product>BootCom-Maui-Shared-Controls</Product>
 		<Description>Shared controls used for .NET Maui</Description>
