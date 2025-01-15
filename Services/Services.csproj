@@ -4,10 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>BootCom-Maui-Shared-Services</PackageId>
     <Title>BootCom Services For Maui</Title>
-    <Version>1.0.0</Version>
     <Authors>Chris Boot</Authors>
     <Product>BootCom-Maui-Shared-Services</Product>
     <Description>Services used for the BootCom .NET Maui shared libraries</Description>
