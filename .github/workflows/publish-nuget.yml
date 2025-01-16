@@ -56,6 +56,16 @@ jobs:
         CURRENT_INTERFACES_VERSION=$(cat interfaces_version.txt)
         echo "CURRENT_INTERFACES_VERSION=$CURRENT_INTERFACES_VERSION" >> $GITHUB_ENV
 
+    - name: Get Current Internal Models Version from File
+      id: get-internal-models-version
+      shell: bash
+      run: |
+        if [ ! -f internal_models_version.txt ]; then
+        echo "1.0.0" > internal_models_version.txt
+        fi
+        CURRENT_INTERNAL_MODELS_VERSION=$(cat internal_models_version.txt)
+        echo "CURRENT_INTERNAL_MODELS_VERSION=$CURRENT_INTERNAL_MODELS_VERSION" >> $GITHUB_ENV
+
     - name: Increment Interfaces Version
       id: increment-interfaces-version
       shell: bash
@@ -86,6 +96,16 @@ jobs:
         echo "$NEW_CONTROLS_VERSION" > ./controls_version.txt  # Specify the file path explicitly
         echo "NEW_CONTROLS_VERSION=$NEW_CONTROLS_VERSION" >> $GITHUB_ENV
 
+    - name: Increment Internal Models Version
+      id: increment-internal-models-version
+      shell: bash
+      run: |
+        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_INTERNAL_MODELS_VERSION }}"
+        PATCH=$((PATCH + 1))
+        NEW_INTERNAL_MODELS_VERSION="$MAJOR.$MINOR.$PATCH"
+        echo "$NEW_INTERNAL_MODELS_VERSION" > ./internal_models_version.txt  # Specify the file path explicitly
+        echo "NEW_INTERNAL_MODELS_VERSION=$NEW_INTERNAL_MODELS_VERSION" >> $GITHUB_ENV
+        
     - name: Commit Updated Version
       run: |
         git config --global user.name "GitHub Actions"
@@ -93,8 +113,12 @@ jobs:
         git add controls_version.txt
         git add services_version.txt
         git add interfaces_version.txt
+        git add internal_models_version.txt
         git commit -m "Increment version to ${{ env.NEW_CONTROLS_VERSION }}"
         git push --force
+
+    - name: Build internal models project
+      run: dotnet build Models/Models.Internal/Models.Internal.csproj --configuration Release
 
     - name: Build controls project
       run: dotnet build Common/Controls/Controls.csproj --configuration Release
@@ -104,6 +128,9 @@ jobs:
 
     - name: Build interfaces project
       run: dotnet build Interfaces/Interfaces.csproj --configuration Release
+
+    - name: Pack internal models NuGet package
+      run: dotnet pack Models/Models.Internal/Models.Internal.csproj --configuration Release --output Models/Models.Internal/bin/Release /p:PackageVersion=${{ env.NEW_INTERNAL_MODELS_VERSION }}
 
     - name: Pack interfaces NuGet package
       run: dotnet pack Interfaces/Interfaces.csproj --configuration Release --output Interfaces/bin/Release /p:PackageVersion=${{ env.NEW_INTERFACES_VERSION }}
@@ -120,6 +147,16 @@ jobs:
         $files = Get-ChildItem -Path "Interfaces/bin/Release" -Filter *.nupkg -Recurse
         if ($files.Count -eq 0) {
           throw "No .nupkg files found in Interfaces/bin/Release"
+        }
+        $packagePath = $files[0].FullName
+        dotnet nuget push "$packagePath" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+
+    - name: Publish internal models to NuGet
+      shell: pwsh
+      run: |
+        $files = Get-ChildItem -Path "Models/Models.Internal/bin/Release" -Filter *.nupkg -Recurse
+        if ($files.Count -eq 0) {
+          throw "No .nupkg files found in Models/Models.Internal/bin/Release"
         }
         $packagePath = $files[0].FullName
         dotnet nuget push "$packagePath" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
