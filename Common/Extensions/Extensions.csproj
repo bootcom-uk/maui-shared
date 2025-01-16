@@ -5,9 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>BootCom-Maui-Shared-Extensions</PackageId>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>BootCom Extensions For Maui</Title>
-    <Version>1.0.1</Version>
     <Authors>Chris Boot</Authors>
     <Product>BootCom-Maui-Shared-Extensions</Product>
     <Description>Extension methods used for the BootCom .NET Maui shared libraries</Description>
