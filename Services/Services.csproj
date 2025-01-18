@@ -14,6 +14,7 @@
   <ItemGroup>
     <PackageReference Include="BootCom-Maui-Shared-Extensions" Version="1.0.4" />
     <PackageReference Include="BootCom-Maui-Shared-Interfaces" Version="1.0.6" />
+    <PackageReference Include="BootCom-Maui-Shared-Internal-Models" Version="1.0.5" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
