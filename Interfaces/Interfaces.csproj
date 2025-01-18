@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BootCom-Maui-Shared-Internal-Models" Version="1.0.0" />
+    <PackageReference Include="BootCom-Maui-Shared-Internal-Models" Version="1.0.5" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
   </ItemGroup>
 
