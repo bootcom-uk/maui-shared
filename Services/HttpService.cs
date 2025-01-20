@@ -45,7 +45,7 @@ namespace Services
                 return new HttpResponse<T?>()
                 {
                     StatusCode = responseMessage.StatusCode,
-                    Success = true,
+                    Success = responseMessage.IsSuccessStatusCode,
                     Result = JsonSerializer.Deserialize<T>(await responseMessage.Content.ReadAsStreamAsync())
                 };
                  
@@ -56,6 +56,13 @@ namespace Services
                 {
                     Success = false,
                     Exception = wex.StackTrace
+                };
+            } catch(Exception ex)
+            {
+                return new HttpResponse<T?>()
+                {
+                    Success = false,
+                    Exception = ex.StackTrace
                 };
             }
             
