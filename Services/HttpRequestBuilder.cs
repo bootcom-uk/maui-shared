@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Services
 {
@@ -100,7 +101,7 @@ namespace Services
                 throw new InvalidOperationException("HTTP method must be set.");
         }
 
-        private async Task<HttpResponse<T?>> SendRequestAsync<T>(bool deserializeResponse = true)
+        private async Task<HttpResponseMessage?> SendRequestAsync(bool deserializeResponse = true)
         {
             ValidateRequest();
 
@@ -127,38 +128,15 @@ namespace Services
                         continue;
                     }
 
-                    if (deserializeResponse)
-                    {
-                        // Return the response with deserialization
-                        return new HttpResponse<T?>()
-                        {
-                            StatusCode = response.StatusCode,
-                            Success = response.IsSuccessStatusCode,
-                            Result = response.IsSuccessStatusCode
-                                ? JsonSerializer.Deserialize<T>(await response.Content.ReadAsStreamAsync(), serializerOptions)
-                                : default
-                        };
-                    }
-                    else
-                    {
-                        // Return the response without deserialization
-                        return (HttpResponse<T?>)(object)new HttpResponse()
-                        {
-                            StatusCode = response.StatusCode,
-                            Success = response.IsSuccessStatusCode,
-                            Result = response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : null
-                        };
-                    }
+                    return response;
+
+                    
                 }
                 catch (WebException wex)
                 {
                     if (attempts >= _retryCount)
                     {
-                        return new HttpResponse<T?>()
-                        {
-                            Success = false,
-                            Exception = wex.ToString()
-                        };
+                        throw wex;
                     }
 
                     attempts++;
@@ -167,11 +145,7 @@ namespace Services
                 {
                     if (attempts >= _retryCount)
                     {
-                        return new HttpResponse<T?>()
-                        {
-                            Success = false,
-                            Exception = ex.Message
-                        };
+                        throw ex;
                     }
 
                     attempts++;
@@ -180,15 +154,66 @@ namespace Services
         }
 
         // Generic version for deserialized responses
-        public Task<HttpResponse<T?>> SendAsync<T>()
+        public async Task<HttpResponse<T?>> SendAsync<T>()
         {
-            return SendRequestAsync<T>();
+            try
+            {
+                var responseMessage = await SendRequestAsync();
+                return new()
+                {
+                    Success = responseMessage!.IsSuccessStatusCode,
+                    StatusCode = responseMessage!.StatusCode,
+                    Result = responseMessage!.IsSuccessStatusCode ? await JsonSerializer.DeserializeAsync<T>(await responseMessage.Content.ReadAsStreamAsync()) : default
+                };
+
+            } catch(WebException wex)
+            {
+                return new()
+                {
+                    Success = false,
+                    Exception = wex.ToString()
+                };
+            } catch(Exception ex)
+            {
+                return new()
+                {
+                    Success = false,
+                    Exception = ex.ToString()
+                };
+            }
+            
         }
 
         // Non-generic version for responses without a type
-        public Task<HttpResponse> SendAsync()
+        public async Task<HttpResponse> SendAsync()
         {
-            return SendRequestAsync<HttpResponse>(deserializeResponse: false);
+            try
+            {
+                var responseMessage = await SendRequestAsync();
+                return new()
+                {
+                    Success = responseMessage!.IsSuccessStatusCode,
+                    StatusCode = responseMessage!.StatusCode,
+                    Result = await responseMessage.Content.ReadAsStringAsync()
+                };
+
+            }
+            catch (WebException wex)
+            {
+                return new()
+                {
+                    Success = false,
+                    Exception = wex.ToString()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new()
+                {
+                    Success = false,
+                    Exception = ex.ToString()
+                };
+            }
         }
 
     }
