@@ -1,6 +1,7 @@
 ﻿using Models.Internal;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 
@@ -63,8 +64,15 @@ namespace Services
 
         // Add form data to the request
         public HttpRequestBuilder WithFormContent(Dictionary<string, string> formData)
-        {
-            _requestMessage.Content = new FormUrlEncodedContent(formData);
+        {            
+            var content = new MultipartFormDataContent();
+            foreach(var item in formData)
+            {
+                content.Add(new StringContent(item.Value, Encoding.UTF8, MediaTypeNames.Text.Plain), item.Key);
+            }
+            
+            _requestMessage.Content = content;
+
             return this;
         }
 
