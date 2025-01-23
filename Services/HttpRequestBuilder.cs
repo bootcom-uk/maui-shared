@@ -100,8 +100,7 @@ namespace Services
                 throw new InvalidOperationException("HTTP method must be set.");
         }
 
-        // Send the request and handle retries/status codes
-        public async Task<HttpResponse<T?>> SendAsync<T>()
+        private async Task<HttpResponse<T?>> SendRequestAsync<T>(bool deserializeResponse = true)
         {
             ValidateRequest();
 
@@ -128,15 +127,28 @@ namespace Services
                         continue;
                     }
 
-                    // Return the response
-                    return new HttpResponse<T?>()
+                    if (deserializeResponse)
                     {
-                        StatusCode = response.StatusCode,
-                        Success = response.IsSuccessStatusCode,
-                        Result = response.IsSuccessStatusCode
-                            ? JsonSerializer.Deserialize<T>(await response.Content.ReadAsStreamAsync(), serializerOptions)
-                            : default
-                    };
+                        // Return the response with deserialization
+                        return new HttpResponse<T?>()
+                        {
+                            StatusCode = response.StatusCode,
+                            Success = response.IsSuccessStatusCode,
+                            Result = response.IsSuccessStatusCode
+                                ? JsonSerializer.Deserialize<T>(await response.Content.ReadAsStreamAsync(), serializerOptions)
+                                : default
+                        };
+                    }
+                    else
+                    {
+                        // Return the response without deserialization
+                        return (HttpResponse<T?>)(object)new HttpResponse()
+                        {
+                            StatusCode = response.StatusCode,
+                            Success = response.IsSuccessStatusCode,
+                            Result = response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : null
+                        };
+                    }
                 }
                 catch (WebException wex)
                 {
@@ -166,5 +178,18 @@ namespace Services
                 }
             }
         }
+
+        // Generic version for deserialized responses
+        public Task<HttpResponse<T?>> SendAsync<T>()
+        {
+            return SendRequestAsync<T>();
+        }
+
+        // Non-generic version for responses without a type
+        public Task<HttpResponse> SendAsync()
+        {
+            return SendRequestAsync<HttpResponse>(deserializeResponse: false);
+        }
+
     }
 }
