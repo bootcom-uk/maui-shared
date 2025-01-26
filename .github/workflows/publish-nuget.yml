@@ -26,116 +26,32 @@ jobs:
     - name: Install .NET MAUI
       run: dotnet workload install maui
 
-    - name: Get Current Controls Version from File
-      id: get-controls-version
+    - name: Get Current Version from File
+      id: get-version
       shell: bash
       run: |
-        if [ ! -f controls_version.txt ]; then
-        echo "1.0.0" > controls_version.txt
+        if [ ! -f version.txt ]; then
+        echo "1.2.0" > version.txt
         fi
-        CURRENT_CONTROLS_VERSION=$(cat controls_version.txt)
-        echo "CURRENT_CONTROLS_VERSION=$CURRENT_CONTROLS_VERSION" >> $GITHUB_ENV
-
-    - name: Get Current Services Version from File
-      id: get-services-version
+        CURRENT_VERSION=$(cat version.txt)
+        echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+        
+    - name: Increment Version
+      id: increment-version
       shell: bash
       run: |
-        if [ ! -f services_version.txt ]; then
-        echo "1.0.0" > services_version.txt
-        fi
-        CURRENT_SERVICE_VERSION=$(cat services_version.txt)
-        echo "CURRENT_SERVICE_VERSION=$CURRENT_SERVICE_VERSION" >> $GITHUB_ENV
-
-    - name: Get Current Interfaces Version from File
-      id: get-interfaces-version
-      shell: bash
-      run: |
-        if [ ! -f interfaces_version.txt ]; then
-        echo "1.0.0" > interfaces_version.txt
-        fi
-        CURRENT_INTERFACES_VERSION=$(cat interfaces_version.txt)
-        echo "CURRENT_INTERFACES_VERSION=$CURRENT_INTERFACES_VERSION" >> $GITHUB_ENV
-
-    - name: Get Current Internal Models Version from File
-      id: get-internal-models-version
-      shell: bash
-      run: |
-        if [ ! -f internal_models_version.txt ]; then
-        echo "1.0.0" > internal_models_version.txt
-        fi
-        CURRENT_INTERNAL_MODELS_VERSION=$(cat internal_models_version.txt)
-        echo "CURRENT_INTERNAL_MODELS_VERSION=$CURRENT_INTERNAL_MODELS_VERSION" >> $GITHUB_ENV
-
-    - name: Get Current Extensions Version from File
-      id: get-extensions-version
-      shell: bash
-      run: |
-        if [ ! -f extensions_version.txt ]; then
-        echo "1.0.0" > extensions_version.txt
-        fi
-        CURRENT_EXTENTIONS_VERSION=$(cat extensions_version.txt)
-        echo "CURRENT_EXTENTIONS_VERSION=$CURRENT_EXTENTIONS_VERSION" >> $GITHUB_ENV
-
-    - name: Increment Interfaces Version
-      id: increment-interfaces-version
-      shell: bash
-      run: |
-        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_INTERFACES_VERSION }}"
+        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_VERSION }}"
         PATCH=$((PATCH + 1))
         NEW_INTERFACES_VERSION="$MAJOR.$MINOR.$PATCH"
-        echo "$NEW_INTERFACES_VERSION" > ./interfaces_version.txt  # Specify the file path explicitly
-        echo "NEW_INTERFACES_VERSION=$NEW_INTERFACES_VERSION" >> $GITHUB_ENV
-
-    - name: Increment Services Version
-      id: increment-services-version
-      shell: bash
-      run: |
-        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_SERVICE_VERSION }}"
-        PATCH=$((PATCH + 1))
-        NEW_SERVICES_VERSION="$MAJOR.$MINOR.$PATCH"
-        echo "$NEW_SERVICES_VERSION" > ./services_version.txt  # Specify the file path explicitly
-        echo "NEW_SERVICES_VERSION=$NEW_SERVICES_VERSION" >> $GITHUB_ENV
-
-    - name: Increment Controls Version
-      id: increment-controls-version
-      shell: bash
-      run: |
-        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_CONTROLS_VERSION }}"
-        PATCH=$((PATCH + 1))
-        NEW_CONTROLS_VERSION="$MAJOR.$MINOR.$PATCH"
-        echo "$NEW_CONTROLS_VERSION" > ./controls_version.txt  # Specify the file path explicitly
-        echo "NEW_CONTROLS_VERSION=$NEW_CONTROLS_VERSION" >> $GITHUB_ENV
-
-    - name: Increment Internal Models Version
-      id: increment-internal-models-version
-      shell: bash
-      run: |
-        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_INTERNAL_MODELS_VERSION }}"
-        PATCH=$((PATCH + 1))
-        NEW_INTERNAL_MODELS_VERSION="$MAJOR.$MINOR.$PATCH"
-        echo "$NEW_INTERNAL_MODELS_VERSION" > ./internal_models_version.txt  # Specify the file path explicitly
-        echo "NEW_INTERNAL_MODELS_VERSION=$NEW_INTERNAL_MODELS_VERSION" >> $GITHUB_ENV
-
-    - name: Increment Extentions Version
-      id: increment-extensions-version
-      shell: bash
-      run: |
-        IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_EXTENTIONS_VERSION }}"
-        PATCH=$((PATCH + 1))
-        NEW_EXTENTIONS_VERSION="$MAJOR.$MINOR.$PATCH"
-        echo "$NEW_EXTENTIONS_VERSION" > ./extensions_version.txt  # Specify the file path explicitly
-        echo "NEW_EXTENTIONS_VERSION=$NEW_EXTENTIONS_VERSION" >> $GITHUB_ENV
+        echo "$NEW_VERSION" > ./version.txt  # Specify the file path explicitly
+        echo "$NEW_VERSION=$$NEW_VERSION" >> $GITHUB_ENV
         
     - name: Commit Updated Version
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git add controls_version.txt
-        git add services_version.txt
-        git add interfaces_version.txt
-        git add internal_models_version.txt
-        git add extensions_version.txt
-        git commit -m "Increment version to ${{ env.NEW_CONTROLS_VERSION }}"
+        git add version.txt
+        git commit -m "Increment version to ${{ env.NEW_VERSION }}"
         git push --force
 
     - name: Build extensions models project
@@ -154,19 +70,19 @@ jobs:
       run: dotnet build Interfaces/Interfaces.csproj --configuration Release
 
     - name: Pack extensions NuGet package
-      run: dotnet pack Common/Extensions/Extensions.csproj --configuration Release --output Common/Extensions/bin/Release /p:PackageVersion=${{ env.NEW_EXTENTIONS_VERSION }}
+      run: dotnet pack Common/Extensions/Extensions.csproj --configuration Release --output Common/Extensions/bin/Release /p:PackageVersion=${{ env.NEW_VERSION }}
 
     - name: Pack internal models NuGet package
-      run: dotnet pack Models/Models.Internal/Models.Internal.csproj --configuration Release --output Models/Models.Internal/bin/Release /p:PackageVersion=${{ env.NEW_INTERNAL_MODELS_VERSION }}
+      run: dotnet pack Models/Models.Internal/Models.Internal.csproj --configuration Release --output Models/Models.Internal/bin/Release /p:PackageVersion=${{ env.NEW_VERSION }}
 
     - name: Pack interfaces NuGet package
-      run: dotnet pack Interfaces/Interfaces.csproj --configuration Release --output Interfaces/bin/Release /p:PackageVersion=${{ env.NEW_INTERFACES_VERSION }}
+      run: dotnet pack Interfaces/Interfaces.csproj --configuration Release --output Interfaces/bin/Release /p:PackageVersion=${{ env.NEW_VERSION }}
 
     - name: Pack controls NuGet package
-      run: dotnet pack Common/Controls/Controls.csproj --configuration Release --output Common/Controls/bin/Release /p:PackageVersion=${{ env.NEW_CONTROLS_VERSION }}
+      run: dotnet pack Common/Controls/Controls.csproj --configuration Release --output Common/Controls/bin/Release /p:PackageVersion=${{ env.NEW_VERSION }}
 
     - name: Pack services NuGet package
-      run: dotnet pack Services/Services.csproj  --configuration Release --output Services/bin/Release /p:PackageVersion=${{ env.NEW_SERVICES_VERSION }}
+      run: dotnet pack Services/Services.csproj  --configuration Release --output Services/bin/Release /p:PackageVersion=${{ env.NEW_VERSION }}
 
     - name: Publish extensions to NuGet
       shell: pwsh
