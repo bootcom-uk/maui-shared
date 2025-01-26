@@ -42,8 +42,8 @@ jobs:
       run: |
         IFS='.' read -r MAJOR MINOR PATCH <<< "${{ env.CURRENT_VERSION }}"
         PATCH=$((PATCH + 1))
-        NEW_INTERFACES_VERSION="$MAJOR.$MINOR.$PATCH"
-        echo "NEW_VERSION" > ./version.txt  # Specify the file path explicitly
+        NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+        echo "$NEW_VERSION" > ./version.txt  # Specify the file path explicitly
         echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         
     - name: Commit Updated Version
