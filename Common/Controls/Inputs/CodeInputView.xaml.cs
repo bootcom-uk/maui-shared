@@ -7,8 +7,8 @@ public partial class CodeInputView : ContentView
     public static readonly BindableProperty CodeProperty =
         BindableProperty.Create(nameof(Code), typeof(string), typeof(CodeInputView), string.Empty, BindingMode.TwoWay);
 
-    public static readonly BindableProperty ExpectedCodeProperty =
-        BindableProperty.Create(nameof(ExpectedCode), typeof(string), typeof(CodeInputView), string.Empty);
+    public static readonly BindableProperty CodeCompleteProperty =
+        BindableProperty.Create(nameof(CodeComplete), typeof(bool), typeof(CodeInputView), false, BindingMode.OneWayToSource);
 
     public string Code
     {
@@ -16,10 +16,10 @@ public partial class CodeInputView : ContentView
         set => SetValue(CodeProperty, value);
     }
 
-    public string ExpectedCode
+    public bool CodeComplete
     {
-        get => (string)GetValue(ExpectedCodeProperty);
-        set => SetValue(ExpectedCodeProperty, value);
+        get => (bool)GetValue(CodeCompleteProperty);
+        set => SetValue(CodeCompleteProperty, value);
     }
 
     public CodeInputView()
@@ -38,7 +38,7 @@ public partial class CodeInputView : ContentView
         var entry = sender as Microsoft.Maui.Controls.Entry;
 
         // Move to the next or previous input box
-        if (entry.Text.Length == 1)
+        if (entry!.Text.Length == 1)
         {
             MoveFocusForward(entry);
         }
@@ -47,14 +47,8 @@ public partial class CodeInputView : ContentView
             MoveFocusBackward(entry);
         }
 
-        // Update the Code property
-        Code = string.Concat(_entries.Select(x => x.Text));
-
-        // Check if the code is complete and validate
-        if (Code.Length == 6)
-        {
-            ValidateCode();
-        }
+       ValidateCode();
+        
     }
 
     private void MoveFocusForward(Microsoft.Maui.Controls.Entry currentEntry)
@@ -77,11 +71,13 @@ public partial class CodeInputView : ContentView
 
     private void ValidateCode()
     {
-        var isValid = Code == ExpectedCode;
+
+        Code = string.Concat(_entries.Select(x => x.Text));
+        CodeComplete = Code.Length == 6;
 
         foreach (var entry in _entries)
         {
-            entry.BackgroundColor = isValid ? Colors.LightGreen : Colors.LightCoral;
+            entry.BackgroundColor = CodeComplete ? Colors.LightGreen : Colors.LightCoral;
         }
     }
 }
