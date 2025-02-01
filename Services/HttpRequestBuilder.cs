@@ -14,7 +14,7 @@ namespace Services
         private readonly HttpRequestMessage _requestMessage;
         private int _retryCount = 0;
         private Func<HttpResponseMessage, bool>? _retryCondition;
-        private readonly Dictionary<HttpStatusCode, Func<Task>> _statusHandlers = new();
+        private readonly Dictionary<HttpStatusCode, Func<HttpRequestMessage, Task>> _statusHandlers = new();
         private readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
         {
             PropertyNameCaseInsensitive = true
@@ -86,7 +86,7 @@ namespace Services
         }
 
         // Define an action for a specific HTTP status code
-        public HttpRequestBuilder OnStatus(HttpStatusCode statusCode, Func<Task> action)
+        public HttpRequestBuilder OnStatus(HttpStatusCode statusCode, Func<HttpRequestMessage, Task> action)
         {
             _statusHandlers[statusCode] = action;
             return this;
@@ -117,7 +117,7 @@ namespace Services
                     // Handle specific status codes
                     if (_statusHandlers.TryGetValue(response.StatusCode, out var handler))
                     {
-                        await handler(); // Perform the custom action
+                        await handler(_requestMessage); // Perform the custom action
                         continue;        // Retry the original request
                     }
 
