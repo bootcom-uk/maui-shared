@@ -124,12 +124,17 @@ namespace Services
                     // Retry based on a condition
                     if (_retryCondition != null && attempts < _retryCount && _retryCondition(response))
                     {
-                        attempts++;
+                        
                         continue;
                     }
 
-                    return response;
+                    if (response.IsSuccessStatusCode || _retryCount == 0 || attempts == _retryCount - 1)
+                    {
+                        return response;
+                    }
 
+                    attempts++;
+                    
                     
                 }
                 catch (WebException wex)
