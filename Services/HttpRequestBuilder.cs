@@ -1,4 +1,5 @@
 ﻿using Models.Internal;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mime;
@@ -11,7 +12,7 @@ namespace Services
     public class HttpRequestBuilder
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly HttpRequestMessage _requestMessage;
+        private HttpRequestMessage _requestMessage;
         private int _retryCount = 0;
         private Func<HttpResponseMessage, bool>? _retryCondition;
         private readonly Dictionary<HttpStatusCode, Func<HttpRequestMessage, Task>> _statusHandlers = new();
@@ -101,6 +102,37 @@ namespace Services
                 throw new InvalidOperationException("HTTP method must be set.");
         }
 
+        private async Task<HttpRequestMessage> CloneRequest(HttpRequestMessage request)
+        {
+            HttpRequestMessage clone = new(request.Method, request.RequestUri);
+
+            // Copy the request's content (via a MemoryStream) into the cloned object
+            var ms = new MemoryStream();
+            if (request.Content != null)
+            {
+                await request.Content.CopyToAsync(ms).ConfigureAwait(false);
+                ms.Position = 0;
+                clone.Content = new StreamContent(ms);
+
+                // Copy the content headers
+                if (request.Content.Headers != null)
+                    foreach (var h in request.Content.Headers)
+                        clone.Content.Headers.Add(h.Key, h.Value);
+            }
+
+            //if (req.Headers.Authorization != null)
+            //{
+            //    req.Headers.Authorization = new AuthenticationHeaderValue("bearer", JwtToken);
+            //}
+
+            clone.Version = request.Version;
+
+            foreach (KeyValuePair<string, IEnumerable<string>> header in request.Headers)
+                clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+
+            return clone;
+        }
+
         private async Task<HttpResponseMessage?> SendRequestAsync(bool deserializeResponse = true)
         {
             ValidateRequest();
@@ -114,9 +146,11 @@ namespace Services
                 {
                     var response = await httpClient.SendAsync(_requestMessage);
 
+                    _requestMessage = await CloneRequest(_requestMessage);
+
                     // Handle specific status codes
-                    if (_statusHandlers.TryGetValue(response.StatusCode, out var handler))
-                    {
+                    if (!response.IsSuccessStatusCode && _statusHandlers.TryGetValue(response.StatusCode, out var handler))
+                    {                        
                         await handler(_requestMessage); // Perform the custom action
                         continue;        // Retry the original request
                     }
@@ -168,7 +202,7 @@ namespace Services
                 {
                     Success = responseMessage!.IsSuccessStatusCode,
                     StatusCode = responseMessage!.StatusCode,
-                    Result = responseMessage!.IsSuccessStatusCode ? await JsonSerializer.DeserializeAsync<T>(await responseMessage.Content.ReadAsStreamAsync()) : default
+                    Result = responseMessage!.IsSuccessStatusCode ? await JsonSerializer.DeserializeAsync<T>(await responseMessage.Content.ReadAsStreamAsync(), serializerOptions) : default
                 };
 
             } catch(WebException wex)
