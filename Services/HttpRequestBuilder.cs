@@ -41,6 +41,12 @@ namespace Services
             return this;
         }
 
+        public HttpRequestBuilder PreRequest(Func<HttpRequestMessage, bool>? condition)
+        {            
+            condition?.Invoke(_requestMessage);            
+            return this;
+        }
+
         // Set the HTTP method
         public HttpRequestBuilder WithMethod(HttpMethod method)
         {
