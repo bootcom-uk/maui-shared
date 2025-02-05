@@ -41,7 +41,7 @@ namespace Services
             return this;
         }
 
-        public HttpRequestBuilder PreRequest(Func<HttpRequestMessage, bool>? condition)
+        public HttpRequestBuilder PreRequest(Func<HttpRequestMessage, Task>? condition)
         {            
             condition?.Invoke(_requestMessage);            
             return this;
