@@ -15,6 +15,7 @@ namespace Services
         private HttpRequestMessage _requestMessage;
         private int _retryCount = 0;
         private Func<HttpResponseMessage, bool>? _retryCondition;
+        private Func<HttpRequestMessage, Task>? _preRequest;
         private readonly Dictionary<HttpStatusCode, Func<HttpRequestMessage, Task>> _statusHandlers = new();
         private readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
         {
@@ -42,8 +43,8 @@ namespace Services
         }
 
         public HttpRequestBuilder PreRequest(Func<HttpRequestMessage, Task>? condition)
-        {            
-            condition?.Invoke(_requestMessage);            
+        {
+            _preRequest = condition;
             return this;
         }
 
@@ -150,6 +151,12 @@ namespace Services
             {
                 try
                 {
+                    // Apply pre-request logic before sending the request
+                    if (_preRequest != null)
+                    {
+                        await _preRequest(_requestMessage);
+                    }
+
                     var response = await httpClient.SendAsync(_requestMessage);
 
                     _requestMessage = await CloneRequest(_requestMessage);
