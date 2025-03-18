@@ -65,7 +65,12 @@ namespace Services
         // Add JSON content to the request
         public HttpRequestBuilder WithJsonContent<T>(T content)
         {
-            var json = JsonSerializer.Serialize(content);
+            return WithJsonContent(content, serializerOptions);
+        }
+
+        public HttpRequestBuilder WithJsonContent<T>(T content, JsonSerializerOptions options)
+        {
+            var json = JsonSerializer.Serialize(content, options);
             _requestMessage.Content = new StringContent(json);
             _requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             return this;
