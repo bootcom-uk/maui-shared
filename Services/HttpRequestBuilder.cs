@@ -98,6 +98,18 @@ namespace Services
             return this;
         }
 
+        public HttpRequestBuilder WithRetry(int retryCount, TimeSpan delayBetweenRequests)
+        {
+            _retryCount = retryCount;
+
+            _retryCondition = (request) =>
+            {
+                Task.Delay(delayBetweenRequests).Wait(); // Block synchronously since _retryCondition is not async
+                return true;
+            };
+            return this;
+        }
+
         // Define an action for a specific HTTP status code
         public HttpRequestBuilder OnStatus(HttpStatusCode statusCode, Func<HttpRequestMessage, Task> action)
         {
