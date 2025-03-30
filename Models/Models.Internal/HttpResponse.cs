@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 
 namespace Models.Internal
 {
@@ -6,6 +7,7 @@ namespace Models.Internal
     public class HttpResponse<T>
     {
         public HttpStatusCode StatusCode { get; set; }
+        public Dictionary<string, string>? Headers { get; set; }
         public bool Success { get; set; }
         public T? Result { get; set; }
         public string? Exception { get; set; }
@@ -15,6 +17,7 @@ namespace Models.Internal
     public class HttpResponse
     {
         public HttpStatusCode StatusCode { get; set; }
+        public Dictionary<string, string>? Headers { get; set; }
         public bool Success { get; set; }
         public string? Result { get; set; } // Optional response body as string
         public string? Exception { get; set; }
