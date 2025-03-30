@@ -228,12 +228,16 @@ namespace Services
             try
             {
                 var responseMessage = await SendRequestAsync();
-                return new()
+
+                var httpResponse = new HttpResponse<T>()
                 {
                     Success = responseMessage!.IsSuccessStatusCode,
                     StatusCode = responseMessage!.StatusCode,
-                    Result = responseMessage!.IsSuccessStatusCode ? await JsonSerializer.DeserializeAsync<T>(await responseMessage.Content.ReadAsStreamAsync(), serializerOptions) : default
+                    Result = responseMessage!.IsSuccessStatusCode ? await JsonSerializer.DeserializeAsync<T>(await responseMessage.Content.ReadAsStreamAsync(), serializerOptions) : default,
+                    Headers = new Dictionary<string, string>()
                 };
+                responseMessage.Headers.ToList().ForEach(h => httpResponse.Headers[h.Key] = h.Value.FirstOrDefault());
+                return httpResponse!;
 
             } catch(WebException wex)
             {
@@ -259,12 +263,15 @@ namespace Services
             try
             {
                 var responseMessage = await SendRequestAsync();
-                return new()
+                var httpResponse = new HttpResponse()
                 {
                     Success = responseMessage!.IsSuccessStatusCode,
                     StatusCode = responseMessage!.StatusCode,
-                    Result = await responseMessage.Content.ReadAsStringAsync()
+                    Result = await responseMessage.Content.ReadAsStringAsync(),
+                    Headers = new Dictionary<string, string>()
                 };
+                responseMessage.Headers.ToList().ForEach(h => httpResponse.Headers[h.Key] = h.Value.FirstOrDefault());
+                return httpResponse;
 
             }
             catch (WebException wex)
