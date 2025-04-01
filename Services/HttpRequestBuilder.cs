@@ -223,7 +223,7 @@ namespace Services
         }
 
         // Generic version for deserialized responses
-        public async Task<HttpResponse<T?>> SendAsync<T>()
+        public async Task<HttpResponse<T?>> SendAsync<T>(JsonSerializerOptions? options = null)
         {
             try
             {
@@ -233,7 +233,7 @@ namespace Services
                 {
                     Success = responseMessage!.IsSuccessStatusCode,
                     StatusCode = responseMessage!.StatusCode,
-                    Result = responseMessage!.IsSuccessStatusCode ? await JsonSerializer.DeserializeAsync<T>(await responseMessage.Content.ReadAsStreamAsync(), serializerOptions) : default,
+                    Result = responseMessage!.IsSuccessStatusCode ? await JsonSerializer.DeserializeAsync<T>(await responseMessage.Content.ReadAsStreamAsync(), options ?? serializerOptions) : default,
                     Headers = new Dictionary<string, string>()
                 };
                 responseMessage.Headers.ToList().ForEach(h => httpResponse.Headers[h.Key] = h.Value.FirstOrDefault());
